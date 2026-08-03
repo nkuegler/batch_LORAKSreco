@@ -6,7 +6,7 @@ The scripts that are described on this page are part of the **loraks_reconstruct
 
 ---
 
-## Table of Contents
+## Table of Contents :)
 
 1. [Usage](#usage)
     - [Necessary software (repositories)](#necessary-software-repositories)
