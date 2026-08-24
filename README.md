@@ -164,5 +164,6 @@ The shell script `recon.sh` specifies the task and the required resources in the
 ## ToDos:
 + try out, document, and commit how to use UV instead of conda
 + adjust all paths to Pathlib instead of OS or other path libraries, so that the application will also run on Windows computers. (Although additional changes may be needed for full Windows compatibility, this change improves cross-platform support.)
-+ paths to raw data should rather be specified as dictionaries instead of lists
++ raw data filenames should rather be specified in a list with arbitrary number of files to account for non-standard acquisitions (drop the whole validity check based on number of files within `recon_call.py`)
 + default rank 150 does not work for all smaps (must be adjusted in loraksConfig.json) -> implement rank specification (or rather loraksConfig file specification) in config file
++ The json file saved to document which files were reconstructed does not seem to include all the smaps when `with_smaps=True` (seems to only include the first file of a session). Check and fix this.
