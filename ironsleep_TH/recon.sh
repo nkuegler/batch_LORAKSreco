@@ -19,7 +19,7 @@ valid_dir='(.*batch_loraksreco)'
 
 if [[ "$current_dir" =~ $valid_dir ]]; then
 # checks if recon.sh is within the batch_loraksreco/ directory
-    RELPATH="${BASH_REMATCH[1]}/"
+    RELPATH="${BASH_REMATCH[1]}"
 else
 # else does exits and does not attempt MATLAB command
     echo "Failed to find loraksConfig.json, ensure recon.sh is within the batch_loraksreco/ directory" >&2
@@ -29,10 +29,10 @@ fi
 
 # Use adjRank config if rawdata filename contains "smap" or "sens"
 if [[ "$rawdata" == *"smap"* ]] || [[ "$rawdata" == *"sens"* ]]; then
-    config="${RELPATH}loraksConfig_adjRank.json"
+    config="${RELPATH}/ironsleep_TH/loraksConfig_adjRank.json"
     echo "Detected 'smap' or 'sens' in filename, using adjRank config"
 else
-    config="${RELPATH}loraksConfig.json"
+    config="${RELPATH}/ironsleep_TH/loraksConfig.json"
 fi
 
 start=$(date +%s)
