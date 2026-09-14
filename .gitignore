@@ -1,4 +1,4 @@
 logs/
 ironsleep_TH/kerrin*
-__pycache__/
+**/__pycache__/
 infantdata_shir/adult_data_info.txt
