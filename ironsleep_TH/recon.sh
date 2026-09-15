@@ -14,25 +14,20 @@ outdir=$2
 echo "rawdata: $rawdata"
 echo "outdir: $outdir"
 
+# recon.sh and loraksConfig json need to be in the same directory
 current_dir=$(dirname "$(readlink -f "$0")")
-valid_dir='(.*batch_loraksreco)'
-
-if [[ "$current_dir" =~ $valid_dir ]]; then
-# checks if recon.sh is within the batch_loraksreco/ directory
-    RELPATH="${BASH_REMATCH[1]}"
-else
-# else does exits and does not attempt MATLAB command
-    echo "Failed to find loraksConfig.json, ensure recon.sh is within the batch_loraksreco/ directory" >&2
-    exit 1
-fi
-
 
 # Use adjRank config if rawdata filename contains "smap" or "sens"
 if [[ "$rawdata" == *"smap"* ]] || [[ "$rawdata" == *"sens"* ]]; then
-    config="${RELPATH}/ironsleep_TH/loraksConfig_adjRank.json"
+    config="${current_dir}/loraksConfig_adjRank.json"
     echo "Detected 'smap' or 'sens' in filename, using adjRank config"
 else
-    config="${RELPATH}/ironsleep_TH/loraksConfig.json"
+    config="${current_dir}/loraksConfig.json"
+fi
+
+if ! [ -f "${config}" ]; then
+    echo "Error: Failed to find config: ${config}"
+    exit 1
 fi
 
 start=$(date +%s)
