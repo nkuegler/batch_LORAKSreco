@@ -14,12 +14,20 @@ outdir=$2
 echo "rawdata: $rawdata"
 echo "outdir: $outdir"
 
+# recon.sh and loraksConfig json need to be in the same directory
+current_dir=$(dirname "$(readlink -f "$0")")
+
 # Use adjRank config if rawdata filename contains "smap" or "sens"
 if [[ "$rawdata" == *"smap"* ]] || [[ "$rawdata" == *"sens"* ]]; then
-    config="/data/u_kuegler_software/git/loraks_reconstruction/ironsleep_TH/loraksConfig_adjRank.json"
+    config="${current_dir}/loraksConfig_adjRank.json"
     echo "Detected 'smap' or 'sens' in filename, using adjRank config"
 else
-    config="/data/u_kuegler_software/git/loraks_reconstruction/ironsleep_TH/loraksConfig.json"
+    config="${current_dir}/loraksConfig.json"
+fi
+
+if ! [ -f "${config}" ]; then
+    echo "Error: Failed to find config: ${config}"
+    exit 1
 fi
 
 start=$(date +%s)
