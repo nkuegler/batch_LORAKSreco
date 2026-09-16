@@ -32,8 +32,6 @@ t1w_raw = config.t1w_raw
 pdw_raw = config.pdw_raw
 mtw_raw = config.mtw_raw
 ernst_raw = config.ernst_raw
-b1afi_ptx_raw = config.b1afi_ptx_raw
-b1afi_stx_raw = config.b1afi_stx_raw
 sub_ses = config.sub_ses
 name_storage_dir = config.name_storage_dir
 with_smaps = config.with_smaps
@@ -53,8 +51,6 @@ t1w_recon = bool(t1w_raw)
 pdw_recon = bool(pdw_raw)
 mtw_recon = bool(mtw_raw)
 ernst_recon = bool(ernst_raw)
-b1afi_ptx_recon = bool(b1afi_ptx_raw)
-b1afi_stx_recon = bool(b1afi_stx_raw)
 
 
 ## if with_smaps, each session is used twice to account for the accompanying sensitivity maps
@@ -150,34 +146,6 @@ def sbatch_commands():
                         os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir}')
                         session_data['ernst'] = ernst_input_path
                 
-                if b1afi_ptx_recon:
-                    if not b1afi_ptx_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        # B1AFI maps stored in a separate directory, as they are excluded from the bidsification at the moment
-                        b1afi_output_dir = os.path.join(output_dir, "AFIB1_reco") 
-                        if not os.path.exists(b1afi_output_dir):
-                            os.makedirs(b1afi_output_dir, exist_ok=True)
-
-                        b1afi_ptx_input_path = os.path.join(input_path, b1afi_ptx_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {b1afi_ptx_input_path} {b1afi_output_dir}')
-                        # os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {b1afi_ptx_input_path} {output_dir}')
-                        session_data['b1afi_ptx'] = b1afi_ptx_input_path
-                
-                if b1afi_stx_recon:
-                    if not b1afi_stx_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        # B1AFI maps stored in a separate directory, as they are excluded from the bidsification at the moment
-                        b1afi_output_dir = os.path.join(output_dir, "AFIB1_reco") 
-                        if not os.path.exists(b1afi_output_dir):
-                            os.makedirs(b1afi_output_dir, exist_ok=True)
-                        
-                        b1afi_stx_input_path = os.path.join(input_path, b1afi_stx_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {b1afi_stx_input_path} {b1afi_output_dir}')
-                        # os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {b1afi_stx_input_path} {output_dir}')
-                        session_data['b1afi_stx'] = b1afi_stx_input_path
-
                 # store paths to the raw data for each subject and session
                 if subject_name not in output_paths_raw:
                     output_paths_raw[subject_name] = {}
