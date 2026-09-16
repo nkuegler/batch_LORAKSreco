@@ -2,7 +2,7 @@
 
 This page describes how to reconstruct the raw MRI data acquired in the IronSleep project to magnitude and phase maps in the NIfTI data format. 
 
-The scripts that are described on this page are part of the **loraks_reconstruction** repository ([Public Github repo](https://github.com/nkuegler/loraks_reconstruction)). Feel free to clone or fork the repository. If you encounter any problems, [send me an e-mail](mailto:kuegler@cbs.mpg.de?subject=Problems%20with%20loraks_reconstruction) or a message on Minerva (user: kuegler).
+The scripts that are described on this page are part of the **batch_LORAKSreco** repository ([Gitlab Repository](https://gitlab.gwdg.de/cbs-neurophy/batch_loraksreco), [Public Github repo](https://github.com/nkuegler/batch_LORAKSreco)). Feel free to clone or fork the repository. If you encounter any problems, [send me an e-mail](mailto:kuegler@cbs.mpg.de?subject=Problems%20with%20loraks_reconstruction) or a message on Minerva (user: kuegler).
 
 ---
 
@@ -16,9 +16,9 @@ The scripts that are described on this page are part of the **loraks_reconstruct
 ---
 
 ## Usage
-The scripts in the **loraks_reconstruction** repository are used to specify paths, configure the LORAKS reconstruction, and submit the reconstruction of each session's data in a separate batch job utilizing SLURM.<br>
-The different folders in the repository are the scripts used for different projects. As this documentation is focusing on analyzing the data acquired in the IronSleep project, I will refer to the directory `ironsleep_TH/`. The other directories may also work but may need some manual adjustment and I cannot guarantee that they are up to date.<br>
-The logs are saved in separate directories in the `logs/` folder (excluded from the repository by adding it to the `.gitignore`).
+The scripts in the **batch_LORAKSreco** repository are used to specify paths, configure the LORAKS reconstruction, and submit the reconstruction of each session's data in a separate batch job utilizing SLURM.<br>
+If your data differs substantially from the data these scripts were designed for, you may need to adjust the code and configuration files accordingly.<br>
+The logs are saved in separate directories in the `logs/` folder (excluded from the repository by adding it to the `.gitignore`). You can define the log file output path in the `recon.sh` script (see Step 6 below).
 
 ### Necessary software (repositories)
 + **image-reconstruction**
@@ -27,8 +27,8 @@ The logs are saved in separate directories in the `logs/` folder (excluded from 
 + **CompileMRI (mritools including ROMEO)**
     + Information on how to install ROMEO and how to include it in the config file for the reconstruction can be found in the `WIP_romeoPhaseUnwrapping` branch's README under the heading *Using ROMEO for phase unwrapping during MCPC-3D-S coil combination*.
     + As stated in the **image_reconstruction** README, download the latest release of [ROMEO from Github](https://github.com/korbinian90/CompileMRI.jl/releases) (on MPI CBS computers, download the version compiled for Ubuntu 20.04).
-    + Examples of the `loraksConfig.json` can be found in the **loraks_reconstruction** repository.
-+ **loraks_reconstruction** 
+    + Examples of the `loraksConfig.json` can be found in the **batch_LORAKSreco** repository.
++ **batch_LORAKSreco** 
     + This repository contains scripts to submit the reconstructions of all specified sessions as separate batch jobs to a compute server using SLURM. [Reach out](mailto:kuegler@cbs.mpg.de?subject=Problems%20with%20loraks_reconstruction) if you encounter problems or need help with the code (kuegler@cbs.mpg.de).
 
 ### How to run the LORAKS reconstruction
@@ -113,7 +113,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
 
 + **Step 5:**
     + Create the correct `loraksConfig.json` according to the instructions in the README of the `WIP_romeoPhaseUnwrapping` branch in the **image-reconstruction** repository. Make sure that the `loraksConfig.json` is located in the same directory as the `recon.sh` script!
-    + An example can be found in the **loraks_reconstruction** repository but you need to adjust the `romeoBinaryPath` to the location of your ROMEO installation.
+    + An example can be found in the **batch_LORAKSreco** repository but you need to adjust the `romeoBinaryPath` to the location of your ROMEO installation.
     + ```
       {
        "method": "loraks",
@@ -122,7 +122,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
        "multiEchoPhaseUnwrappingMethod": "romeo"
       }
       ```
-    > Warning: The reconstruction may fail for very small matrices as the `rank parameter can't be larger than the matrix dimensions`. I encountered this problem when trying to reconstruct sensitivity maps acquired with the body coil. To overcome the issue, you need to adjust the `rank` parameter in the config file (see `loraksConfig_adjRank.json` in the `ironsleep_TH/` folder as an example).
+    > Warning: The reconstruction may fail for very small matrices as the `rank parameter can't be larger than the matrix dimensions`. I encountered this problem when trying to reconstruct sensitivity maps acquired with the body coil. To overcome the issue, you need to adjust the `rank` parameter in the config file `loraksConfig_adjRank.json`.
 
 + **Step 6:**
     + Access the `recon.sh` script and adjust the required resources and log file output path in the SBATCH parameters. The more resources you request for the job, the later your job will be scheduled. Try to keep the resource request as high as necessary, but as low as possible.
@@ -132,7 +132,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
       #SBATCH -c 16					# 16 cores for fast reco
       #SBATCH --mem 500G			# 0.5 mm fully sampled is around 220G, need maybe double
       #SBATCH --time 1800			# 10 echoes at 2 hours per echo but some nodes take 3 hours per echo
-      #SBATCH -o /data/u_kuegler_software/git/loraks_reconstruction/logs/ironsleep_TH/%j.out	# redirect the output to log files
+      #SBATCH -o /data/u_kuegler_software/git/batch_LORAKSreco/logs/ironsleep_TH/%j.out	# redirect the output to log files
 
       rawdata=$1
       outdir=$2
@@ -148,7 +148,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
         + Check that the correct config file is imported in `recon_call.py` (especially if you created a new config file with a different name).
     + Reminder: Make sure that you are on the SLURM compute server (Step 1) and that the correct conda environment is activated (Step 3).
     + ```
-      cd /path/to/loraks-reconstruction/ironsleep_TH
+      cd /path/to/batch_LORAKSreco
       ./recon_call.py
       ````
 
