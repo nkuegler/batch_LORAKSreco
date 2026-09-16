@@ -1,3 +1,0 @@
-sbatch -p all,group_servers,gr_weiskopf /data/pt_02262/bids_test/loraks_test/loraks_scripts/recon.sh /data/pt_gr_weiskopf_raw2023-q1/20230511_1/meas_MID00064_FID17040_t1w_kp_mtflash3d_v1s_0p6.dat /data/pt_02262/bids_test/loraks_test/sub-1/ses-1/t1w_loraks
-sbatch -p all,group_servers,gr_weiskopf /data/pt_02262/bids_test/loraks_test/loraks_scripts/recon.sh /data/pt_gr_weiskopf_raw2023-q1/20230511_1/meas_MID00065_FID17041_pdw_kp_mtflash3d_v1s_0p6.dat /data/pt_02262/bids_test/loraks_test/sub-1/ses-1/pdw_loraks
-sbatch -p all,group_servers,gr_weiskopf /data/pt_02262/bids_test/loraks_test/loraks_scripts/recon.sh /data/pt_gr_weiskopf_raw2023-q1/20230511_1/meas_MID00068_FID17044_ernst_kp_mtflash3d_v1s_0p5_sag.dat /data/pt_02262/bids_test/loraks_test/sub-1/ses-1/ernst_loraks

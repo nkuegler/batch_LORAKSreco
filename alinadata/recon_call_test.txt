@@ -1,2 +1,0 @@
-sbatch -p all,group_servers,gr_weiskopf /data/u_kuegler_software/git/loraks_reconstruction/alinadata/recon.sh /data/pt_03002/data/source/15484.08/20241107/dcm/rawdata/meas_MeasUID47_t1w_kp_mtflash3d_v1s_0p6.dat /data/pt_03002/data/source/15484.08/20241107/nii_loraks
-sbatch -p all,group_servers,gr_weiskopf /data/u_kuegler_software/git/loraks_reconstruction/alinadata/recon.sh /data/pt_03002/data/source/15484.08/20241107/dcm/rawdata/meas_MeasUID49_pdw_kp_mtflash3d_v1s_0p6.dat /data/pt_03002/data/source/15484.08/20241107/nii_loraks

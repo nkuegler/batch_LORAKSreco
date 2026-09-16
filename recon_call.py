@@ -19,8 +19,7 @@ import warnings
 import json
 from datetime import datetime
 
-import config_alina_smaps as config # import the correct config file
-
+import default_configs.example_config as config # import the correct config file
 
 # script defining slurm parameters and reconstruction command
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,11 +32,10 @@ t1w_raw = config.t1w_raw
 pdw_raw = config.pdw_raw
 mtw_raw = config.mtw_raw
 ernst_raw = config.ernst_raw
-b1afi_ptx_raw = config.b1afi_ptx_raw
-b1afi_stx_raw = config.b1afi_stx_raw
 sub_ses = config.sub_ses
 name_storage_dir = config.name_storage_dir
 with_smaps = config.with_smaps
+smaps_per_session = config.smaps_per_session
 
 
 ## check if input_parent and output_parent exist
@@ -53,19 +51,16 @@ t1w_recon = bool(t1w_raw)
 pdw_recon = bool(pdw_raw)
 mtw_recon = bool(mtw_raw)
 ernst_recon = bool(ernst_raw)
-b1afi_ptx_recon = bool(b1afi_ptx_raw)
-b1afi_stx_recon = bool(b1afi_stx_raw)
-
 
 
 ## if with_smaps, each session is used twice to account for the accompanying sensitivity maps
 if with_smaps:
     new_sub_ses = []
     for sj, ss in sub_ses:
-        doubled_sessions = []
+        extended_sessions = []
         for s in ss:
-            doubled_sessions.extend([s, s])
-        new_sub_ses.append([sj, doubled_sessions])
+            extended_sessions.extend([s] * (smaps_per_session + 1))
+        new_sub_ses.append([sj, extended_sessions])
     sub_ses = new_sub_ses
 
 # check if sub_ses, t1w, pdw, and mtw are of the same length
@@ -77,7 +72,6 @@ for _, sessions in sub_ses:
         number_of_sessions += 1
     else:
         raise TypeError(f"Sessions must be of type list or string, got {type(sessions).__name__}")
-
 
 # Keep in mind: if with_smaps=True, the number of sessions is doubled
 if pdw_recon and sum(len(sl) for sl in pdw_raw) != number_of_sessions:
@@ -100,10 +94,10 @@ def sbatch_commands():
 
         if not isinstance(subject_name, str):
             raise TypeError("Subject (sub_ses[0]) must be of type string")
-        
+
         if isinstance(session_name, str):
             session_name = [session_name] # convert session element to list for iteration
-
+        
         if isinstance(session_name, list):
             for j, sess in enumerate(session_name):
                 
@@ -117,7 +111,7 @@ def sbatch_commands():
                     continue
                 
                 # specify input directory (raw data)
-                input_path = os.path.join(input_parent, subject_name, sess, "dcm/rawdata")
+                input_path = os.path.join(input_parent, subject_name, sess, "raw")
                 session_data = {}
                 
                 if t1w_recon:
@@ -125,7 +119,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else:
                         t1w_input_path = os.path.join(input_path, t1w_raw[i][j])
-                        os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir}')
                         session_data['t1w'] = t1w_input_path
                 
                 if pdw_recon:
@@ -133,7 +127,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else:
                         pdw_input_path = os.path.join(input_path, pdw_raw[i][j])
-                        os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir}')
                         session_data['pdw'] = pdw_input_path
 
                 if mtw_recon:
@@ -141,7 +135,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else: 
                         mtw_input_path = os.path.join(input_path, mtw_raw[i][j])
-                        os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir}')
                         session_data['mtw'] = mtw_input_path
                 
                 if ernst_recon:
@@ -149,37 +143,9 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else:
                         ernst_input_path = os.path.join(input_path, ernst_raw[i][j])
-                        os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir}')
                         session_data['ernst'] = ernst_input_path
                 
-                if b1afi_ptx_recon:
-                    if not b1afi_ptx_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        # B1AFI maps stored in a separate directory, as they are excluded from the bidsification at the moment
-                        b1afi_output_dir = os.path.join(output_dir, "AFIB1_reco") 
-                        if not os.path.exists(b1afi_output_dir):
-                            os.makedirs(b1afi_output_dir, exist_ok=True)
-
-                        b1afi_ptx_input_path = os.path.join(input_path, b1afi_ptx_raw[i][j])
-                        os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {b1afi_ptx_input_path} {b1afi_output_dir}')
-                        # os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {b1afi_ptx_input_path} {output_dir}')
-                        session_data['b1afi_ptx'] = b1afi_ptx_input_path
-                
-                if b1afi_stx_recon:
-                    if not b1afi_stx_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        # B1AFI maps stored in a separate directory, as they are excluded from the bidsification at the moment
-                        b1afi_output_dir = os.path.join(output_dir, "AFIB1_reco") 
-                        if not os.path.exists(b1afi_output_dir):
-                            os.makedirs(b1afi_output_dir, exist_ok=True)
-                        
-                        b1afi_stx_input_path = os.path.join(input_path, b1afi_stx_raw[i][j])
-                        os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {b1afi_stx_input_path} {b1afi_output_dir}')
-                        # os.system(f'sbatch -p long,group_servers,gr_weiskopf {recon_script} {b1afi_stx_input_path} {output_dir}')
-                        session_data['b1afi_stx'] = b1afi_stx_input_path
-
                 # store paths to the raw data for each subject and session
                 if subject_name not in output_paths_raw:
                     output_paths_raw[subject_name] = {}
