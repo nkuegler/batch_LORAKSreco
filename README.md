@@ -112,7 +112,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
     > If the specified file name is empty `""`, no batch job will be submitted for this file. 
 
 + **Step 5:**
-    + Create the correct `loraksConfig.json` according to the instructions in the README of the `WIP_romeoPhaseUnwrapping` branch in the **image-reconstruction** repository.
+    + Create the correct `loraksConfig.json` according to the instructions in the README of the `WIP_romeoPhaseUnwrapping` branch in the **image-reconstruction** repository. Make sure that the `loraksConfig.json` is located in the same directory as the `recon.sh` script!
     + An example can be found in the **loraks_reconstruction** repository but you need to adjust the `romeoBinaryPath` to the location of your ROMEO installation.
     + ```
       {
