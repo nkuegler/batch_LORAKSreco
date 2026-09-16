@@ -19,7 +19,7 @@ import warnings
 import json
 from datetime import datetime
 
-import default_configs.config_ironsleep_sub1_2026_smapsBC as config # import the correct config file
+import default_configs.example_config as config # import the correct config file
 
 # script defining slurm parameters and reconstruction command
 script_dir = os.path.dirname(os.path.abspath(__file__))
