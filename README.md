@@ -32,8 +32,8 @@ The logs are saved in separate directories in the `logs/` folder (excluded from 
     + This repository contains scripts to submit the reconstructions of all specified sessions as separate batch jobs to a compute server using SLURM. [Reach out](mailto:kuegler@cbs.mpg.de?subject=Problems%20with%20loraks_reconstruction) if you encounter problems or need help with the code (kuegler@cbs.mpg.de).
 
 ### How to run the LORAKS reconstruction
-The python script `recon_call.py` inherits parameters specified in `config_ironsleep.py` (mainly paths and file names). According to those, it builds the commands for submitting jobs to the SLURM compute server.<br> 
-You will only define a parent input directory, where the script will recursively process each subject and session folder that is specified in the `config_ironsleep.py` file. It is important, that the folder/file structure is conform with: 
+The python script `recon_call.py` inherits parameters specified in `example_config.py` within the `default_configs` subdirectory (mainly paths and file names). According to those, it builds the commands for submitting jobs to the SLURM compute server.<br> 
+You will only define a parent input directory, where the script will recursively process each subject and session folder that is specified in the `example_config.py` file. It is important, that the folder/file structure is conform with: 
 ```
 parent_dir/
 ├── subject_01/
@@ -80,7 +80,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
       ```
 
 + **Step 4:**
-    + Access the `config_ironsleep.py` file and define the following parameters:
+    + Access the `example_config.py` file and define the following parameters:
         + `sub_ses`: nested list, defining subject name and one or multiple session names (string or list of strings)
             + `[[subj1, sess1], [subj2, sess1], ...]` → session names as string if only one session per subject
             + `[[subj1, [sess1, sess2, sess3, ...]], [subj2, [sess1, sess2, sess3, ...]], ...]` → session names as list of strings if multiple sessions per subject
