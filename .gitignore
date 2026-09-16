@@ -2,3 +2,6 @@ logs/
 ironsleep_TH/kerrin*
 **/__pycache__/
 infantdata_shir/adult_data_info.txt
+pyproject.toml
+uv.lock
+.github/
