@@ -10,19 +10,20 @@
 
 rawdata=$1
 outdir=$2
+script_dir=$3
 
 echo "rawdata: $rawdata"
 echo "outdir: $outdir"
+echo "script_dir: $script_dir"
 
-# recon.sh and loraksConfig json need to be in the same directory
-current_dir=$(dirname "$(readlink -f "$0")")
+# recon_call.py, recon.sh, and loraksConfig json need to be in the same directory!
 
 # Use adjRank config if rawdata filename contains "smap" or "sens"
 if [[ "$rawdata" == *"smap"* ]] || [[ "$rawdata" == *"sens"* ]]; then
-    config="${current_dir}/loraksConfig_adjRank.json"
+    config="${script_dir}/loraksConfig_adjRank.json"
     echo "Detected 'smap' or 'sens' in filename, using adjRank config"
 else
-    config="${current_dir}/loraksConfig.json"
+    config="${script_dir}/loraksConfig.json"
 fi
 
 if ! [ -f "${config}" ]; then

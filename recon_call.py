@@ -119,7 +119,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else:
                         t1w_input_path = os.path.join(input_path, t1w_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir} {script_dir}')
                         session_data['t1w'] = t1w_input_path
                 
                 if pdw_recon:
@@ -127,7 +127,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else:
                         pdw_input_path = os.path.join(input_path, pdw_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir} {script_dir}')
                         session_data['pdw'] = pdw_input_path
 
                 if mtw_recon:
@@ -135,7 +135,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else: 
                         mtw_input_path = os.path.join(input_path, mtw_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir} {script_dir}')
                         session_data['mtw'] = mtw_input_path
                 
                 if ernst_recon:
@@ -143,7 +143,7 @@ def sbatch_commands():
                         pass # no batch job submitted
                     else:
                         ernst_input_path = os.path.join(input_path, ernst_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir}')
+                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir} {script_dir}')
                         session_data['ernst'] = ernst_input_path
                 
                 # store paths to the raw data for each subject and session
