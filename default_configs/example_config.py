@@ -19,55 +19,70 @@ smaps_per_session = 2 # integer, number of sensitivity maps per session
 
 ## specifying names of the actual pdw, t1w, mtw, and ernst .dat files
 ## Each one has to be a nested list, where the sessions of each subject are specified in a separate list.
-pdw_raw = [[  # sub1-ID  
-              "filename_smap.dat",   # ses1-ID
-              "filename_smap.dat",  # ses1-ID
-              "filename_pdw.dat",    # ses1-ID
-           ],
-           [  # sub1-ID
-              "filename_smap.dat",   # ses2-ID
-              "filename_smap.dat",  # ses2-ID
-              "filename_pdw.dat",    # ses2-ID
-           ],
-           [  # sub2-ID
-              "filename_smap.dat",   # ses1-ID
-              "filename_smap.dat",  # ses1-ID
-              "filename_pdw.dat",    # ses1-ID
-           ]
-]
+pdw_raw = [
+            [  # sub1-ID  
+               [ # ses1-ID
+                  "filename_smap.dat",   # ses1-ID
+                  "filename_smap.dat",  # ses1-ID
+                  "filename_pdw.dat",    # ses1-ID
+               ],
+               [  # ses2-ID
+                  "filename_smap.dat",   # ses2-ID
+                  "filename_smap.dat",  # ses2-ID
+                  "filename_pdw.dat",    # ses2-ID
+               ]
+            ],
+            [  # sub2-ID
+              [ # ses1-ID
+               "filename_smap.dat",   # ses1-ID
+               "filename_smap.dat",  # ses1-ID
+               "filename_pdw.dat",    # ses1-ID
+              ]
+            ]
+          ]
            
-t1w_raw = [[  # sub1-ID
-              "filename_smap.dat",   # ses1-ID
-              "filename_smap.dat",  # ses1-ID
-              "filename_t1w.dat",    # ses1-ID
-           ],
-           [  # sub1-ID
-              "filename_smap.dat",   # ses2-ID
-              "filename_smap.dat",  # ses2-ID
-              "filename_t1w.dat",    # ses2-ID
-           ],
-           [  # sub2-ID
-              "filename_smap.dat",   # ses1-ID
-              "filename_smap.dat",  # ses1-ID
-              "filename_t1w.dat",    # ses1-ID
-           ]
-]
+t1w_raw = [
+            [  # sub1-ID  
+               [ # ses1-ID
+                  "filename_smap.dat",   # ses1-ID
+                  "filename_smap.dat",  # ses1-ID
+                  "filename_t1w.dat",    # ses1-ID
+               ],
+               [  # ses2-ID
+                  "filename_smap.dat",   # ses2-ID
+                  "filename_smap.dat",  # ses2-ID
+                  "filename_t1w.dat",    # ses2-ID
+               ]
+            ],
+            [  # sub2-ID
+              [ # ses1-ID
+               "filename_smap.dat",   # ses1-ID
+               "filename_smap.dat",  # ses1-ID
+               "filename_t1w.dat",    # ses1-ID
+              ]
+            ]
+          ]
 
-mtw_raw = [[  # sub1-ID 
-              "filename_smap.dat",   # ses1-ID
-              "filename_smap.dat",   # ses1-ID
-              "filename_mtw.dat",    # ses1-ID
-           ],
-           [  # sub1-ID
-              "filename_smap.dat",   # ses2-ID
-              "filename_smap.dat",  # ses2-ID
-              "filename_mtw.dat",    # ses2-ID
-           ],
-           [  # sub2-ID
-              "filename_smap.dat",   # ses1-ID
-              "filename_smap.dat",  # ses1-ID
-              "filename_mtw.dat",    # ses1-ID
-           ]
-]
+mtw_raw = [
+            [  # sub1-ID  
+               [ # ses1-ID
+                  "filename_smap.dat",   # ses1-ID
+                  "filename_smap.dat",  # ses1-ID
+                  "filename_mtw.dat",    # ses1-ID
+               ],
+               [  # ses2-ID
+                  "filename_smap.dat",   # ses2-ID
+                  "filename_smap.dat",  # ses2-ID
+                  "filename_mtw.dat",    # ses2-ID
+               ]
+            ],
+            [  # sub2-ID
+              [ # ses1-ID
+               "filename_smap.dat",   # ses1-ID
+               "filename_smap.dat",  # ses1-ID
+               "filename_mtw.dat",    # ses1-ID
+              ]
+            ]
+          ]
 
 ernst_raw = None
