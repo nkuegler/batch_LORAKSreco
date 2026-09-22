@@ -17,6 +17,10 @@ with_smaps = True # boolean, specifies if sensitivity maps are also reconstructe
                    # handled so that each specified session in sub_ses is used twice
 smaps_per_session = 2 # integer, number of sensitivity maps per session
 
+enforce_same_session_length = True # boolen, enforces that all sessions have the same number of files provided.
+                                   # set to False if some data is missing.
+                                   # does not apply if nested list is set to None
+
 ## specifying names of the actual pdw, t1w, mtw, and ernst .dat files
 ## Each one has to be a nested list, where the sessions of each subject are specified in a separate list.
 pdw_raw = [

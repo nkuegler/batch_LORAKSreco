@@ -20,6 +20,7 @@ import json
 from datetime import datetime
 
 import default_configs.example_config as config # import the correct config file
+import utils
 
 # script defining slurm parameters and reconstruction command
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -34,9 +35,8 @@ mtw_raw = config.mtw_raw
 ernst_raw = config.ernst_raw
 sub_ses = config.sub_ses
 name_storage_dir = config.name_storage_dir
-with_smaps = config.with_smaps
 smaps_per_session = config.smaps_per_session
-
+enforce_same_session_length = config.enforce_same_session_length
 
 ## check if input_parent and output_parent exist
 if not os.path.exists(input_parent):
@@ -52,17 +52,6 @@ pdw_recon = bool(pdw_raw)
 mtw_recon = bool(mtw_raw)
 ernst_recon = bool(ernst_raw)
 
-
-## if with_smaps, each session is used twice to account for the accompanying sensitivity maps
-if with_smaps:
-    new_sub_ses = []
-    for sj, ss in sub_ses:
-        extended_sessions = []
-        for s in ss:
-            extended_sessions.extend([s] * (smaps_per_session + 1))
-        new_sub_ses.append([sj, extended_sessions])
-    sub_ses = new_sub_ses
-
 # check if sub_ses, t1w, pdw, and mtw are of the same length
 number_of_sessions = 0
 for _, sessions in sub_ses:
@@ -73,7 +62,6 @@ for _, sessions in sub_ses:
     else:
         raise TypeError(f"Sessions must be of type list or string, got {type(sessions).__name__}")
 
-# Keep in mind: if with_smaps=True, the number of sessions is doubled
 if pdw_recon and sum(len(sl) for sl in pdw_raw) != number_of_sessions:
     raise ValueError("Length of pdw_raw must be the same as the number of sessions")
 if t1w_recon and sum(len(sl) for sl in t1w_raw) != number_of_sessions:
@@ -83,6 +71,12 @@ if mtw_recon and sum(len(sl) for sl in mtw_raw) != number_of_sessions:
 if ernst_recon and sum(len(sl) for sl in ernst_raw) != number_of_sessions:
     raise ValueError("Length of ernst_raw must be the same as the number of sessions")
 
+# check if enforce_same_session_length and count files in each session
+if enforce_same_session_length:
+    files_per_session = None
+    for data in [t1w_raw,pdw_raw,mtw_raw,ernst_raw]:
+        if data:
+            utils.count_session_files(data,files_per_session)
 
 def sbatch_commands():
     output_paths_raw = {}  # store paths to the raw data for each subject and session -> export as json at the end of the script
