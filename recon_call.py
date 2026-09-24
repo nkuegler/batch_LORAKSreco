@@ -35,7 +35,6 @@ mtw_raw = config.mtw_raw
 ernst_raw = config.ernst_raw
 sub_ses = config.sub_ses
 name_storage_dir = config.name_storage_dir
-smaps_per_session = config.smaps_per_session
 enforce_same_session_length = config.enforce_same_session_length
 
 ## check if input_parent and output_parent exist

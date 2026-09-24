@@ -15,7 +15,6 @@ name_storage_dir = "nii_loraks_recon"   # name of the directory in the output_pa
 with_smaps = True # boolean, specifies if sensitivity maps are also reconstructed
                    # each session file MUST have a corresponding sensitivity map file (2x length of t1w_raw, pdw_raw, mtw_raw)
                    # handled so that each specified session in sub_ses is used twice
-smaps_per_session = 2 # integer, number of sensitivity maps per session
 
 enforce_same_session_length = True # boolen, enforces that all sessions have the same number of files provided.
                                    # set to False if some data is missing.
