@@ -71,12 +71,16 @@ if mtw_recon and sum(len(sl) for sl in mtw_raw) != number_of_sessions:
 if ernst_recon and sum(len(sl) for sl in ernst_raw) != number_of_sessions:
     raise ValueError("Length of ernst_raw must be the same as the number of sessions")
 
-# check if enforce_same_session_length and count files in each session
-if enforce_same_session_length:
-    files_per_session = None
-    for data in [t1w_raw,pdw_raw,mtw_raw,ernst_raw]:
+longest_session = None
+# checks if nested list structure is valid
+# finds longest session
+for data in [t1w_raw,pdw_raw,mtw_raw,ernst_raw]:
         if data:
-            utils.count_session_files(data,files_per_session)
+            utils.is_raw_valid(data,enforce_same_session_length)
+            if not enforce_same_session_length:
+                longest_session = utils.count_longest_session(data)
+if enforce_same_session_length:
+    longest_session = utils.count_longest_session(t1w_raw)
 
 def sbatch_commands():
     output_paths_raw = {}  # store paths to the raw data for each subject and session -> export as json at the end of the script
@@ -107,38 +111,39 @@ def sbatch_commands():
                 # specify input directory (raw data)
                 input_path = os.path.join(input_parent, subject_name, sess, "raw")
                 session_data = {}
-                
-                if t1w_recon:
-                    if not t1w_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        t1w_input_path = os.path.join(input_path, t1w_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir} {script_dir}')
-                        session_data['t1w'] = t1w_input_path
-                
-                if pdw_recon:
-                    if not pdw_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        pdw_input_path = os.path.join(input_path, pdw_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir} {script_dir}')
-                        session_data['pdw'] = pdw_input_path
 
-                if mtw_recon:
-                    if not mtw_raw[i][j]:
-                        pass # no batch job submitted
-                    else: 
-                        mtw_input_path = os.path.join(input_path, mtw_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir} {script_dir}')
-                        session_data['mtw'] = mtw_input_path
-                
-                if ernst_recon:
-                    if not ernst_raw[i][j]:
-                        pass # no batch job submitted
-                    else:
-                        ernst_input_path = os.path.join(input_path, ernst_raw[i][j])
-                        os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir} {script_dir}')
-                        session_data['ernst'] = ernst_input_path
+                for k in range(longest_session):
+                    if t1w_recon:
+                        if len(t1w_raw[i][j]) > k and t1w_raw[i][j][k]:
+                            t1w_input_path = os.path.join(input_path, t1w_raw[i][j][k])
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir} {script_dir}')
+                            session_data['t1w'] = t1w_input_path
+                        else:
+                            pass # no batch job submitted
+
+                    if pdw_recon:
+                        if len(pdw_raw[i][j]) > k and pdw_raw[i][j][k]:
+                            pdw_input_path = os.path.join(input_path, pdw_raw[i][j][k])
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir} {script_dir}')
+                            session_data['pdw'] = pdw_input_path
+                        else:
+                            pass # no batch job submitted
+
+                    if mtw_recon:
+                        if len(mtw_raw[i][j]) > k and mtw_raw[i][j][k]:
+                            mtw_input_path = os.path.join(input_path, mtw_raw[i][j][k])
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir} {script_dir}')
+                            session_data['mtw'] = mtw_input_path
+                        else: 
+                            pass # no batch job submitted
+
+                    if ernst_recon:
+                        if len(ernst_raw[i][j]) > k and ernst_raw[i][j][k]:
+                            ernst_input_path = os.path.join(input_path, ernst_raw[i][j][k])
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir} {script_dir}')
+                            session_data['ernst'] = ernst_input_path
+                        else:
+                            pass # no batch job submitted
                 
                 # store paths to the raw data for each subject and session
                 if subject_name not in output_paths_raw:
