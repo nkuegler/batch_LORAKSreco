@@ -117,7 +117,7 @@ def sbatch_commands():
                         if len(t1w_raw[i][j]) > k and t1w_raw[i][j][k]:
                             t1w_input_path = os.path.join(input_path, t1w_raw[i][j][k])
                             os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir} {script_dir}')
-                            session_data['t1w'] = t1w_input_path
+                            session_data.setdefault('t1w', []).append(t1w_input_path)
                         else:
                             pass # no batch job submitted
 
@@ -125,7 +125,7 @@ def sbatch_commands():
                         if len(pdw_raw[i][j]) > k and pdw_raw[i][j][k]:
                             pdw_input_path = os.path.join(input_path, pdw_raw[i][j][k])
                             os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir} {script_dir}')
-                            session_data['pdw'] = pdw_input_path
+                            session_data.setdefault('pdw', []).append(pdw_input_path)
                         else:
                             pass # no batch job submitted
 
@@ -133,7 +133,7 @@ def sbatch_commands():
                         if len(mtw_raw[i][j]) > k and mtw_raw[i][j][k]:
                             mtw_input_path = os.path.join(input_path, mtw_raw[i][j][k])
                             os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir} {script_dir}')
-                            session_data['mtw'] = mtw_input_path
+                            session_data.setdefault('mtw', []).append(mtw_input_path)
                         else: 
                             pass # no batch job submitted
 
@@ -141,7 +141,7 @@ def sbatch_commands():
                         if len(ernst_raw[i][j]) > k and ernst_raw[i][j][k]:
                             ernst_input_path = os.path.join(input_path, ernst_raw[i][j][k])
                             os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir} {script_dir}')
-                            session_data['ernst'] = ernst_input_path
+                            session_data.setdefault('ernst', []).append(ernst_input_path)
                         else:
                             pass # no batch job submitted
                 
