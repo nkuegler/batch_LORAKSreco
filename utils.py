@@ -18,6 +18,9 @@ def is_raw_valid(nested_list: list, enforce_same_length:bool):
                         "Set enforce_same_length=False to disable this check."
                     )
 
-def count_longest_session(nested_list: list) -> int:
-    """finds the longest session length in nested list"""
-    return max((len(ses) for sub in nested_list for ses in sub), default=0)
+def count_longest_session(nested_list: list, length) -> int:
+    """finds the longest session length in nested list updates length"""
+    if length == None:
+        length = 0
+    max_in_session = max((len(ses) for sub in nested_list for ses in sub), default=0)
+    return max_in_session if max_in_session > length else length

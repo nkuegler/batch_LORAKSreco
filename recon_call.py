@@ -77,10 +77,7 @@ longest_session = None
 for data in [t1w_raw,pdw_raw,mtw_raw,ernst_raw]:
         if data:
             utils.is_raw_valid(data,enforce_same_session_length)
-            if not enforce_same_session_length:
-                longest_session = utils.count_longest_session(data)
-if enforce_same_session_length:
-    longest_session = utils.count_longest_session(t1w_raw)
+            longest_session = utils.count_longest_session(data,longest_session)
 
 def sbatch_commands():
     output_paths_raw = {}  # store paths to the raw data for each subject and session -> export as json at the end of the script
