@@ -87,9 +87,8 @@ The shell script `recon.sh` specifies the task and the required resources in the
     + `input_parent`: directory where the subject and session folders containing the raw data are located
     + `output_parent`: directory where the subject and session folders are located that the reconstructed files are stored in
     + `name_storage_dir`: name of the directory that is created in each session's folder to store the reconstructed data
-    + `with_smaps`: reconstruct corresponding sensitivity maps for each raw data file 
-        + If `with_smaps = True` in the config file, the number of sessions specified in `sub_ses` is considered double. Every raw data file name **MUST** be accompanied by an smap file in this case (either specified before or after the corresponding raw data file in the dictionaries described below)!
-        + If there is no smap available or you don't want to reconstruct one for a specific session, you still need to add an empty string `""` or a `"placeholder"` string at the correct position. This will avoid submitting a batch job for this file (as no file matching this name can be found in the specified directory).
+    + `enforce_same_session_length`: (Optional) requirement that each session contain the same number of files.
+      + This done not apply to the raw data if it is set to `None`. e.g. if `ernst_raw = None` it is skipped when checking session lengths.
     + `pdw_raw`: nested list, defining the file names of the the separate PD-weighted raw MRI files
         + ```python
             [
@@ -99,12 +98,15 @@ The shell script `recon.sh` specifies the task and the required resources in the
             ]
             ```
         + `pdw_raw=None`, if you don't want to reconstruct PD-weighted data.
+        + include any PD-weighted associated **sensitivity maps** in this list
     + `t1w_raw`: nested list, defining the file names of the the separate T1-weighted raw MRI files
         + *structure: see pdw_raw*
         + `t1w_raw=None`, if you don't want to reconstruct T1-weighted data.
+        + include any T1-weighted associated **sensitivity maps** in this list
     + `mtw_raw`: nested list, defining the file names of the the separate MT-weighted raw MRI files
         + *structure: see pdw_raw*
         + `mtw_raw=None`, if you don't want to reconstruct MT-weighted data.
+        + include any MT-weighted associated **sensitivity maps** in this list
     + `ernst_raw`: nested list, defining the file names of the the separate Ernst-angle acquisition raw MRI files 
         + *structure: see pdw_raw*
         + `ernst_raw=None`, if you don't want to reconstruct Ernst-angle data.
@@ -164,6 +166,5 @@ The shell script `recon.sh` specifies the task and the required resources in the
 ## ToDos:
 + try out, document, and commit how to use UV instead of conda
 + adjust all paths to Pathlib instead of OS or other path libraries, so that the application will also run on Windows computers. (Although additional changes may be needed for full Windows compatibility, this change improves cross-platform support.)
-+ raw data filenames should rather be specified in a list with arbitrary number of files to account for non-standard acquisitions (drop the whole validity check based on number of files within `recon_call.py`)
 + default rank 150 does not work for all smaps (must be adjusted in loraksConfig.json) -> implement rank specification (or rather loraksConfig file specification) in config file
-+ The json file saved to document which files were reconstructed does not seem to include all the smaps when `with_smaps=True` (seems to only include the first file of a session). Check and fix this.
++ Switch raw data structure from nested_lists to py dictionaries
