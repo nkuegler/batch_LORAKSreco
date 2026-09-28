@@ -1,6 +1,12 @@
 {
   "method": "loraks",
   "useNoiseMeasurements": false,
-  "romeoBinaryPath": "/data/u_kuegler_software/mritools_ubuntu-20.04_4.5.0/bin/romeo",
-  "multiEchoPhaseUnwrappingMethod": "romeo"
+  "romeoBinaryPath": "REPLACED_BY_RECON_CALL_SCRIPT",
+  "multiEchoPhaseUnwrappingMethod": "romeo",
+  "smap_adjustments":{
+    "loraksConfig": {
+      "automaticParameters": false,
+      "rank": 50
+    }
+  }
 }

@@ -25,6 +25,9 @@ import utils
 # script defining slurm parameters and reconstruction command
 script_dir = os.path.dirname(os.path.abspath(__file__))
 recon_script = os.path.join(script_dir, 'recon.sh')
+# path variables
+romeo_binary_path = os.path.abspath(config.romeo_binary_path)
+loraks_config_path = os.path.join(script_dir, config.loraks_config_path) # can be relative or absolute path
 
 # configuration variables
 input_parent = config.input_parent
@@ -81,6 +84,11 @@ for data in [t1w_raw,pdw_raw,mtw_raw,ernst_raw]:
 def sbatch_commands():
     output_paths_raw = {}  # store paths to the raw data for each subject and session -> export as json at the end of the script
 
+    with open(loraks_config_path,'r') as file:
+        config_main = json.load(file)
+    # update romeo path from config
+    config_main['romeoBinaryPath'] = str(romeo_binary_path)
+
     """
     Submit jobs to the cluster
     """
@@ -112,7 +120,8 @@ def sbatch_commands():
                     if t1w_recon:
                         if len(t1w_raw[i][j]) > k and t1w_raw[i][j][k]:
                             t1w_input_path = os.path.join(input_path, t1w_raw[i][j][k])
-                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir} {script_dir}')
+                            config = utils.loraks_config(t1w_input_path,config_main)
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {t1w_input_path} {output_dir} {config}')
                             session_data.setdefault('t1w', []).append(t1w_input_path)
                         else:
                             pass # no batch job submitted
@@ -120,7 +129,8 @@ def sbatch_commands():
                     if pdw_recon:
                         if len(pdw_raw[i][j]) > k and pdw_raw[i][j][k]:
                             pdw_input_path = os.path.join(input_path, pdw_raw[i][j][k])
-                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir} {script_dir}')
+                            config = utils.loraks_config(pdw_input_path,config_main)
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {pdw_input_path} {output_dir} {config}')
                             session_data.setdefault('pdw', []).append(pdw_input_path)
                         else:
                             pass # no batch job submitted
@@ -128,7 +138,8 @@ def sbatch_commands():
                     if mtw_recon:
                         if len(mtw_raw[i][j]) > k and mtw_raw[i][j][k]:
                             mtw_input_path = os.path.join(input_path, mtw_raw[i][j][k])
-                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir} {script_dir}')
+                            config = utils.loraks_config(mtw_input_path,config_main)
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {mtw_input_path} {output_dir} {config}')
                             session_data.setdefault('mtw', []).append(mtw_input_path)
                         else: 
                             pass # no batch job submitted
@@ -136,7 +147,8 @@ def sbatch_commands():
                     if ernst_recon:
                         if len(ernst_raw[i][j]) > k and ernst_raw[i][j][k]:
                             ernst_input_path = os.path.join(input_path, ernst_raw[i][j][k])
-                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir} {script_dir}')
+                            config = utils.loraks_config(ernst_input_path,config_main)
+                            os.system(f'sbatch -p standard,group_servers,gr_weiskopf {recon_script} {ernst_input_path} {output_dir} {config}')
                             session_data.setdefault('ernst', []).append(ernst_input_path)
                         else:
                             pass # no batch job submitted

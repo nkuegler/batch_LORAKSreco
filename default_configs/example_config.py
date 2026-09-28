@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+## path to romeo binary path, required for reconstruction
+## e.g. /data/user_software/mritools_ubuntu-20.04_4.5.0/bin/romeo
+romeo_binary_path = "/path/to/bin/romeo"
+loraks_config_path = "loraksConfig.json" # can be relative or absolute path
+
 ## subject names and session names
 ## if there are multiple sessions for a subject, the session names should be in a list
 sub_ses = [["sub1-ID", ["ses1-ID", "ses2-ID"]], # multiple seesions for a subject can be specified in a list [ses1-ID, ses2-ID, ...]

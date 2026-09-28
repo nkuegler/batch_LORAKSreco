@@ -10,21 +10,14 @@
 
 rawdata=$1
 outdir=$2
-script_dir=$3
+config=$3
 
 echo "rawdata: $rawdata"
 echo "outdir: $outdir"
-echo "script_dir: $script_dir"
+echo "config:\\n"
+echo "$(cat "$config")"
 
 # recon_call.py, recon.sh, and loraksConfig json need to be in the same directory!
-
-# Use adjRank config if rawdata filename contains "smap" or "sens"
-if [[ "$rawdata" == *"smap"* ]] || [[ "$rawdata" == *"sens"* ]]; then
-    config="${script_dir}/loraksConfig_adjRank.json"
-    echo "Detected 'smap' or 'sens' in filename, using adjRank config"
-else
-    config="${script_dir}/loraksConfig.json"
-fi
 
 if ! [ -f "${config}" ]; then
     echo "Error: Failed to find config: ${config}"
@@ -35,6 +28,13 @@ start=$(date +%s)
 
 MATLAB -v 24.2 matlab -batch "reconstruction('$rawdata','$outdir','$config');exit" -sd /data/u_kuegler_software/git/image-reconstruction
 matlab_status=$?
+
+trap 'rm -f "$config"' EXIT
+if ![ -f $config ]; then
+    echo "deleted temp config: ${config}"
+else
+    echo "failed to delete temp config: ${config}"
+fi
 
 end=$(date +%s)
 duration=$((end - start))
