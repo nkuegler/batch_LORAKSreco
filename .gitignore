@@ -6,3 +6,5 @@ pyproject.toml
 uv.lock
 .github/
 default_configs/config*
+tests/synthetic_testdata/sample_bidsified/
+tests/synthetic_testdata/tree_data.txt
