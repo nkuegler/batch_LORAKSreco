@@ -5,6 +5,7 @@
 
 import json
 import os
+import subprocess
 import warnings
 from datetime import datetime
 from types import ModuleType
@@ -12,6 +13,7 @@ from types import ModuleType
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 RECON_SCRIPT = os.path.join(SCRIPT_DIR, "recon.sh")
+SLURM_PARTITION = "standard,group_servers,gr_weiskopf"
 
 
 def _sessions(sub_ses, with_smaps, smaps_per_session):
@@ -42,7 +44,7 @@ def validate_config(sub_ses, pdw_raw, t1w_raw, mtw_raw, ernst_raw, with_smaps, s
     return expanded_sub_ses
 
 
-def sbatch_commands(config_module: ModuleType | None = None, submit=os.system, now=None):
+def sbatch_commands(config_module: ModuleType | None = None, submit=subprocess.run, now=None):
     """Submit configured jobs and write a JSON record of the raw paths used."""
     if config_module is None:
         import default_configs.config_histopark_20260928 as config_module
@@ -87,7 +89,18 @@ def sbatch_commands(config_module: ModuleType | None = None, submit=os.system, n
                 if not raw_files or not raw_files[subject_index][session_index]:
                     continue
                 raw_path = os.path.join(input_path, raw_files[subject_index][session_index])
-                submit(f"sbatch -p standard,group_servers,gr_weiskopf {RECON_SCRIPT} {raw_path} {output_dir} {SCRIPT_DIR}")
+                submit(
+                    [
+                        "sbatch",
+                        "-p",
+                        SLURM_PARTITION,
+                        RECON_SCRIPT,
+                        raw_path,
+                        output_dir,
+                        SCRIPT_DIR,
+                    ],
+                    check=True,
+                )
                 session_data[modality] = raw_path
 
             output_paths_raw.setdefault(subject_name, {})[session] = session_data

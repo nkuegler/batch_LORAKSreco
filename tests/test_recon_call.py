@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from recon_call import sbatch_commands, validate_config
+from recon_call import SLURM_PARTITION, sbatch_commands, validate_config
 from .conftest import SYNTHETIC_DATA
 
 
@@ -50,16 +50,24 @@ def make_config(input_parent, output_parent):
     )
 
 
+def record_submission(submitted):
+    def submit(command, check):
+        assert check is True
+        submitted.append(command)
+
+    return submit
+
+
 def test_sbatch_commands_builds_all_modality_paths_and_json_record(tmp_path):
     submitted = []
     output_parent = tmp_path / "output"
     config = make_config(SYNTHETIC_DATA, output_parent)
 
-    sbatch_commands(config, submitted.append, datetime(2026, 9, 30, 12, 34))
+    sbatch_commands(config, record_submission(submitted), datetime(2026, 9, 30, 12, 34))
 
     assert len(submitted) == 8
-    assert all(command.startswith("sbatch -p standard") for command in submitted)
-    assert all("/sub-SYNTH01/" in command for command in submitted)
+    assert all(command[:3] == ["sbatch", "-p", SLURM_PARTITION] for command in submitted)
+    assert all("/sub-SYNTH01/" in command[4] for command in submitted)
     record = json.loads((output_parent / "loraks_rawData_20260930_1234.json").read_text())
     assert set(record["sub-SYNTH01"]) == {"ses-20260722", "ses-20260804"}
     assert set(record["sub-SYNTH01"]["ses-20260722"]) == {"t1w", "pdw", "mtw", "ernst"}
@@ -73,7 +81,7 @@ def test_existing_output_session_is_skipped(tmp_path):
     submitted = []
 
     with pytest.warns(UserWarning, match="is not empty"):
-        sbatch_commands(make_config(SYNTHETIC_DATA, output_parent), submitted.append, datetime(2026, 9, 30, 12, 35))
+        sbatch_commands(make_config(SYNTHETIC_DATA, output_parent), record_submission(submitted), datetime(2026, 9, 30, 12, 35))
 
     assert len(submitted) == 4
     record = json.loads((output_parent / "loraks_rawData_20260930_1235.json").read_text())
