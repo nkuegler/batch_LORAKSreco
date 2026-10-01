@@ -11,7 +11,8 @@ The scripts that are described on this page are part of the **batch_LORAKSreco**
 1. [Usage](#usage)
     - [Necessary software (repositories)](#necessary-software-repositories)
     - [How to run the LORAKS reconstruction](#how-to-run-the-loraks-reconstruction)
-2. [ToDos](#todos)
+2. [Automated tests](#automated-tests)
+3. [ToDos](#todos)
 
 ---
 
@@ -159,6 +160,19 @@ The shell script `recon.sh` specifies the task and the required resources in the
 
 > Additional information: 
 > Running the `recon_call.py` script will save all individual paths to the raw data files that were specified for the LORAKS reconstruction to `output_parent/loraks_rawData_YYMMDD_HHMM.json`.
+
+## Automated tests
+
+The repository includes a fast `pytest` suite covering the synthetic BIDSified data structure, configuration-template generation, reconstruction job planning, JSON bookkeeping, and `recon.sh` behavior. The tests do not require SLURM, MATLAB, real Twix data, or external DICOM/NIfTI packages.
+
+Install the test dependency and run the suite from the repository root:
+
+```bash
+python -m pip install -e ".[test]"
+python -m pytest -q
+```
+
+The generated fixture in `tests/synthetic_testdata/sample_bidsified/` is intentionally ignored by Git. When it is absent, pytest automatically creates it with `tests/synthetic_testdata/create_fixture.py`. The fixture contains small synthetic stand-ins and is used to test file layout and metadata signatures; its `.dat` files are not suitable for an actual MATLAB LORAKS reconstruction. See [`tests/README.md`](tests/README.md) for the test-module responsibilities.
 
 
 ## ToDos:
