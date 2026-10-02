@@ -6,7 +6,7 @@ The test suite is intentionally divided by responsibility so failures point to a
 | --- | --- | --- |
 | `test_synthetic_fixture.py` | Subject/session layout, symlinks, acquisition coverage, DICOM/NIfTI/raw signatures, and fixture regeneration | None |
 | `test_config_template.py` | Placeholder counts, sensitivity-map variants, and generated Python syntax | None |
-| `test_recon_call.py` | Session expansion, raw path construction, skip behavior, SLURM command creation, and JSON bookkeeping | Fake submit callback |
+| `test_recon_call.py` | Session expansion, raw path construction, skip behavior, SLURM command creation, and JSON bookkeeping in `recon_call.py` | Fake submit callback |
 | `test_recon_sh.py` | Sensitivity config selection, normal config selection, missing-config failure, and MATLAB exit-code propagation | Fake `MATLAB` executable |
 
 Run all tests from the repository root:

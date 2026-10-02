@@ -11,7 +11,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from recon_call import SLURM_PARTITION, sbatch_commands, validate_config
+from recon_call import SLURM_PARTITION, sbatch_commands
+from recon_helpers import validate_config
 from .conftest import SYNTHETIC_DATA
 
 
@@ -98,6 +99,14 @@ def test_validate_config_expands_sensitivity_map_sessions():
     assert expanded == [["sub", ["ses", "ses", "ses"]]]
 
 
+def test_validate_config_expands_scalar_session_names():
+    expanded = validate_config(
+        [["sub", "ses"]], [["a", "b", "c"]], None, None, None, True, 2,
+    )
+
+    assert expanded == [["sub", ["ses", "ses", "ses"]]]
+
+
 def test_validate_config_rejects_mismatched_raw_file_lists():
     with pytest.raises(ValueError, match="Length of pdw_raw"):
         validate_config([["sub", ["ses"]]], [["a"]], None, None, None, True, 2)
@@ -106,3 +115,23 @@ def test_validate_config_rejects_mismatched_raw_file_lists():
 def test_validate_config_rejects_invalid_session_types():
     with pytest.raises(TypeError, match="Sessions must"):
         validate_config([["sub", 7]], None, None, None, None, False, 0)
+
+
+def test_validate_config_rejects_malformed_subject_entries():
+    with pytest.raises(TypeError, match="Each sub_ses entry"):
+        validate_config([["sub"]], None, None, None, None, False, 0)
+
+
+def test_validate_config_rejects_malformed_modality_nesting():
+    with pytest.raises(ValueError, match="one list for each subject"):
+        validate_config([["sub", ["ses"]]], [["raw"], ["extra"]], None, None, None, False, 0)
+
+
+def test_sbatch_commands_rejects_missing_configured_raw_file(tmp_path):
+    config = make_config(tmp_path, tmp_path / "output")
+    submitted = []
+
+    with pytest.raises(FileNotFoundError, match="Configured t1w raw file does not exist"):
+        sbatch_commands(config, record_submission(submitted), datetime(2026, 9, 30, 12, 36))
+
+    assert submitted == []
