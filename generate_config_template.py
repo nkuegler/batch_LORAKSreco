@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+
 """
 Script to generate a prestructured config file based on sub_ses dictionary.
 Creates empty entries for pdw_raw, t1w_raw, mtw_raw, and ernst_raw.
 """
+
+from pathlib import Path
 
 def generate_config_template(sub_ses, with_smaps=True, smaps_per_session=2):
     """
@@ -165,29 +168,27 @@ def format_nested_list(nested_list, sub_ses):
     return result
 
 
+sub_ses = [["29619.5f", ["20260928"]],
+           ["13764.80", ["20260929"]],
+           ["24945.7d", ["20260930"]],
+           ["34728.7d", ["20260928"]],
+          ]
+output_filename = "config_histopark3T_20261002.py"
+
+
 def main():
     """
-    Main function to demonstrate usage.
+    Generate a configuration template.
     """
-    
-    # Example sub_ses dictionary (modify as needed)
-    sub_ses = [["35028.02", ["20260702"]],
-            ["44068.e7", ["20260707"]],
-            ["30816.8c", ["20260709"]],
-            ["13719.18", ["20260714"]],
-            ["38829.2f", ["20260707"]],
-            ["04364.c6", ["20260707"]],
-            ["44568.68", ["20260728"]],
-            ["35076.16", ["20260723"]],
-            ["08950.3f", ["20260804"]],
-    ]
-    
+
     # Generate config template
     config = generate_config_template(sub_ses)
-    
-    # Write to file
-    output_filename = "config_template.py"
-    write_config_to_file(config, output_filename)
+
+    output_path = Path(output_filename)
+    if not output_path.is_absolute():
+        output_path = Path(__file__).resolve().parent / "default_configs" / "intermediate" / output_path
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    write_config_to_file(config, output_path)
     
     print("\nGenerated config structure:")
     print(f"  Subjects: {len(sub_ses)}")

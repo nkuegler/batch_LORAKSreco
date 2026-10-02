@@ -1,7 +1,9 @@
 """Tests for generated reconstruction configuration structure."""
 
 import py_compile
+import importlib
 
+generator_module = importlib.import_module("generate_config_template")
 from generate_config_template import generate_config_template, write_config_to_file
 
 
@@ -34,3 +36,23 @@ def test_written_template_is_valid_python(tmp_path):
     assert "sub-a" in contents
     assert "ses-2" in contents
     assert "pdw_raw =" in contents
+
+
+def test_main_uses_configured_output_filename(tmp_path, monkeypatch):
+    output = tmp_path / "custom_config.py"
+    monkeypatch.setattr(generator_module, "output_filename", str(output))
+
+    monkeypatch.chdir(tmp_path)
+    generator_module.main()
+
+    py_compile.compile(str(output), doraise=True)
+
+
+def test_main_writes_default_output_relative_to_script(tmp_path, monkeypatch):
+    monkeypatch.setattr(generator_module, "output_filename", "generated_config.py")
+    monkeypatch.chdir(tmp_path)
+
+    generator_module.main()
+
+    expected = generator_module.Path(__file__).parent.parent / "default_configs" / "intermediate" / "generated_config.py"
+    assert expected.is_file()

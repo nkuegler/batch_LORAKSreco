@@ -174,6 +174,12 @@ python -m pytest -q
 
 The generated fixture in `tests/synthetic_testdata/sample_bidsified/` is intentionally ignored by Git. When it is absent, pytest automatically creates it with `tests/synthetic_testdata/create_fixture.py`. The fixture contains small synthetic stand-ins and is used to test file layout and metadata signatures; its `.dat` files are not suitable for an actual MATLAB LORAKS reconstruction. See [`tests/README.md`](tests/README.md) for the test-module responsibilities.
 
+To generate a configuration template, edit `output_filename` in `generate_config_template.py`. The script writes the generated file to `default_configs/intermediate/`. This is done to ensure that no finished configuration file is accidentally overwritten. After populating the generated template with the correct paths and file names, move it to `default_configs/` and adjust the import in `recon_call.py` accordingly.
+
+```python
+output_filename = "config_histopark3T_20261002.py"
+```
+
 
 ## ToDos:
 + try out, document, and commit how to use UV instead of conda
