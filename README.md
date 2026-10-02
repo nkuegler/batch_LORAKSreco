@@ -159,7 +159,7 @@ The shell script `recon.sh` specifies the task and the required resources in the
 
 
 > Additional information: 
-> Running the `recon_call.py` script will save all individual paths to the raw data files that were specified for the LORAKS reconstruction to `output_parent/loraks_rawData_YYMMDD_HHMM.json`.
+> Running the `recon_call.py` script will save all individual paths to the raw data files that were specified for the LORAKS reconstruction to `output_parent/loraks_rawData_YYYYMMDD_HHMMSS.json`.
 
 ## Automated tests
 

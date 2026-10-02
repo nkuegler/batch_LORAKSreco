@@ -64,12 +64,12 @@ def test_sbatch_commands_builds_all_modality_paths_and_json_record(tmp_path):
     output_parent = tmp_path / "output"
     config = make_config(SYNTHETIC_DATA, output_parent)
 
-    sbatch_commands(config, record_submission(submitted), datetime(2026, 9, 30, 12, 34))
+    sbatch_commands(config, record_submission(submitted), datetime(2026, 9, 30, 12, 34, 56))
 
     assert len(submitted) == 8
     assert all(command[:3] == ["sbatch", "-p", SLURM_PARTITION] for command in submitted)
     assert all("/sub-SYNTH01/" in command[4] for command in submitted)
-    record = json.loads((output_parent / "loraks_rawData_20260930_1234.json").read_text())
+    record = json.loads((output_parent / "loraks_rawData_20260930_123456.json").read_text())
     assert set(record["sub-SYNTH01"]) == {"ses-20260722", "ses-20260804"}
     assert set(record["sub-SYNTH01"]["ses-20260722"]) == {"t1w", "pdw", "mtw", "ernst"}
 
@@ -82,10 +82,10 @@ def test_existing_output_session_is_skipped(tmp_path):
     submitted = []
 
     with pytest.warns(UserWarning, match="is not empty"):
-        sbatch_commands(make_config(SYNTHETIC_DATA, output_parent), record_submission(submitted), datetime(2026, 9, 30, 12, 35))
+        sbatch_commands(make_config(SYNTHETIC_DATA, output_parent), record_submission(submitted), datetime(2026, 9, 30, 12, 35, 7))
 
     assert len(submitted) == 4
-    record = json.loads((output_parent / "loraks_rawData_20260930_1235.json").read_text())
+    record = json.loads((output_parent / "loraks_rawData_20260930_123507.json").read_text())
     assert "ses-20260722" not in record["sub-SYNTH01"]
     assert "ses-20260804" in record["sub-SYNTH01"]
 

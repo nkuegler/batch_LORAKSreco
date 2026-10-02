@@ -75,7 +75,7 @@ def sbatch_commands(config_module: ModuleType | None = None, submit=subprocess.r
 
             output_paths_raw.setdefault(subject_name, {})[session] = session_data
 
-    timestamp = (now or datetime.now()).strftime("%Y%m%d_%H%M")
+    timestamp = (now or datetime.now()).strftime("%Y%m%d_%H%M%S")
     with open(os.path.join(output_parent, f"loraks_rawData_{timestamp}.json"), "w") as output_file:
         json.dump(output_paths_raw, output_file, indent=4)
 
