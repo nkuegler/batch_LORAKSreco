@@ -2,6 +2,7 @@
 
 import py_compile
 import importlib
+from uuid import uuid4
 
 generator_module = importlib.import_module("generate_config_template")
 from generate_config_template import generate_config_template, write_config_to_file
@@ -49,10 +50,14 @@ def test_main_uses_configured_output_filename(tmp_path, monkeypatch):
 
 
 def test_main_writes_default_output_relative_to_script(tmp_path, monkeypatch):
-    monkeypatch.setattr(generator_module, "output_filename", "generated_config.py")
+    filename = f"test_generated_config_{uuid4().hex}.py"
+    monkeypatch.setattr(generator_module, "output_filename", filename)
     monkeypatch.chdir(tmp_path)
 
-    generator_module.main()
-
     expected = generator_module.Path(__file__).parent.parent / "default_configs" / "intermediate" / "generated_config.py"
-    assert expected.is_file()
+    expected = expected.with_name(filename)
+    try:
+        generator_module.main()
+        assert expected.is_file()
+    finally:
+        expected.unlink(missing_ok=True)
