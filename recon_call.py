@@ -3,6 +3,7 @@
 """Command-line entry point for submitting configured LORAKS jobs."""
 
 import json
+import importlib
 import os
 import subprocess
 import warnings
@@ -15,12 +16,13 @@ from recon_helpers import validate_config, validate_raw_files
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 RECON_SCRIPT = os.path.join(SCRIPT_DIR, "recon.sh")
 SLURM_PARTITION = "standard,group_servers,gr_weiskopf"
+CONFIG_MODULE_NAME = "default_configs.config_histopark_20261002"
 
 
 def sbatch_commands(config_module: ModuleType | None = None, submit=subprocess.run, now=None):
     """Submit configured jobs and write a JSON record of the raw paths used."""
     if config_module is None:
-        import default_configs.config_histopark_20260928 as config_module
+        config_module = importlib.import_module(CONFIG_MODULE_NAME)
 
     input_parent = config_module.input_parent
     output_parent = config_module.output_parent

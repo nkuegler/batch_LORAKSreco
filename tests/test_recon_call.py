@@ -11,6 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import recon_call
 from recon_call import SLURM_PARTITION, sbatch_commands
 from recon_helpers import validate_config
 from .conftest import SYNTHETIC_DATA
@@ -88,6 +89,25 @@ def test_existing_output_session_is_skipped(tmp_path):
     record = json.loads((output_parent / "loraks_rawData_20260930_123507.json").read_text())
     assert "ses-20260722" not in record["sub-SYNTH01"]
     assert "ses-20260804" in record["sub-SYNTH01"]
+
+
+def test_sbatch_commands_uses_configured_module_name(monkeypatch, tmp_path):
+    config = make_config(SYNTHETIC_DATA, tmp_path / "output")
+    imported_names = []
+
+    def import_module(name):
+        imported_names.append(name)
+        return config
+
+    monkeypatch.setattr(recon_call.importlib, "import_module", import_module)
+    monkeypatch.setattr(recon_call, "CONFIG_MODULE_NAME", "default_configs.test_config")
+
+    sbatch_commands(
+        submit=record_submission([]),
+        now=datetime(2026, 9, 30, 12, 35, 8),
+    )
+
+    assert imported_names == ["default_configs.test_config"]
 
 
 def test_validate_config_expands_sensitivity_map_sessions():
