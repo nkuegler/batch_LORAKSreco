@@ -14,8 +14,9 @@ config=$3
 
 echo "rawdata: $rawdata"
 echo "outdir: $outdir"
+# prints the contents of the temp JSON file for logging
 echo "config:\\n"
-echo "$(cat "$config")"
+echo "$(cat "$config")" 
 
 # recon_call.py, recon.sh, and loraksConfig json need to be in the same directory!
 

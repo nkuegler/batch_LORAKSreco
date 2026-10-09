@@ -23,7 +23,7 @@ The logs are saved in separate directories in the `logs/` folder (excluded from 
 ### Necessary software (repositories)
 + **image-reconstruction**
     + This [repository on the Neurophysics Gitlab](https://gitlab.gwdg.de/cbs-neurophy/image-reconstruction) contains the actual MATLAB implementation of the LORAKS reconstruction.
-    + Make sure to use the the branch `WIP_romeoPhaseUnwrapping`, where you can use ROMEO for phase unwrapping during MCPC-3D-S coil combination instead of robustUnwrap. 
+    + Make sure to use the branch `WIP_romeoPhaseUnwrapping`, where you can use ROMEO for phase unwrapping during MCPC-3D-S coil combination instead of robustUnwrap. 
 + **CompileMRI (mritools including ROMEO)**
     + Information on how to install ROMEO and how to include it in the config file for the reconstruction can be found in the `WIP_romeoPhaseUnwrapping` branch's README under the heading *Using ROMEO for phase unwrapping during MCPC-3D-S coil combination*.
     + As stated in the **image_reconstruction** README, download the latest release of [ROMEO from Github](https://github.com/korbinian90/CompileMRI.jl/releases) (on MPI CBS computers, download the version compiled for Ubuntu 20.04).
@@ -80,7 +80,9 @@ The shell script `recon.sh` specifies the task and the required resources in the
       ```
 
 + **Step 4:**
-    + Access the `example_config.py` file and define the following parameters:
+    + Access the `example_config.py` file located in the `default_configs` directory and define the following parameters:
+      + `romeo_binary_path`: the absolute path to the romeo binary found within [CompileMRI](#necessary-software-repositories)
+      + `loraks_config_path`: relative path to the loraks config file, more info in Step 5.
         + `sub_ses`: nested list, defining subject name and one or multiple session names (string or list of strings)
             + `[[subj1, sess1], [subj2, sess1], ...]` → session names as string if only one session per subject
             + `[[subj1, [sess1, sess2, sess3, ...]], [subj2, [sess1, sess2, sess3, ...]], ...]` → session names as list of strings if multiple sessions per subject
@@ -89,12 +91,25 @@ The shell script `recon.sh` specifies the task and the required resources in the
     + `name_storage_dir`: name of the directory that is created in each session's folder to store the reconstructed data
     + `enforce_same_session_length`: (Optional) requirement that each session contain the same number of files.
       + This done not apply to the raw data if it is set to `None`. e.g. if `ernst_raw = None` it is skipped when checking session lengths.
-    + `pdw_raw`: nested list, defining the file names of the the separate PD-weighted raw MRI files
+    + `pdw_raw`: nested list structure similar to bids layout, defining the file names of the the separate PD-weighted raw MRI files
         + ```python
             [
-            [file_sess1, file_sess2, file_sess3, ...], # for subj1
-            [file_sess1, file_sess2, file_sess3, ...], # for subj2
-            [file_sess1, file_sess2, file_sess3, ...] # for subj3
+             [  # sub1 
+               [ # ses1
+                  file1_ses1,
+                  file2_ses1,
+                  filen3_ses1
+               ],
+               [  # ses2
+                  file1_ses2,
+                  file2_ses2,
+                  ...
+               ]
+             ],
+             [  # sub2
+                ...
+             ],
+            ...
             ]
             ```
         + `pdw_raw=None`, if you don't want to reconstruct PD-weighted data.
@@ -115,34 +130,54 @@ The shell script `recon.sh` specifies the task and the required resources in the
 
 + **Step 5:**
     + Create the correct `loraksConfig.json` according to the instructions in the README of the `WIP_romeoPhaseUnwrapping` branch in the **image-reconstruction** repository. Make sure that the `loraksConfig.json` is located in the same directory as the `recon.sh` script!
-    + An example can be found in the **batch_LORAKSreco** repository but you need to adjust the `romeoBinaryPath` to the location of your ROMEO installation.
-    + ```
-      {
-       "method": "loraks",
-       "useNoiseMeasurements": false,
-       "romeoBinaryPath": "/path/to/bin/romeo",
-       "multiEchoPhaseUnwrappingMethod": "romeo"
-      }
+    + `romeoBinaryPath` value is auto-populated from `example_config.py` when `recon_call.py` is run.
+    + An example can be found in the **batch_LORAKSreco** repository.
+      + The example includes sensitivity map adjustments (`smap_adjustments`) which can be defined directly in a example config file. `smap_adjustments` apply to additional LORAKS options to raw data files that are identified as a sensitivity map file. By default any file with `smaps` or `sens`, which can be changed via the `smap_strings` argument within the `utils.loraks_config` function, or via changing the default value in the `utils.py` file.
+    + ```json
+    {
+      "method": "loraks",
+      "useNoiseMeasurements": false,
+      "romeoBinaryPath": "REPLACED_BY_RECON_CALL_SCRIPT",
+      "multiEchoPhaseUnwrappingMethod": "romeo",
+      "smap_adjustments":{
+        "loraksConfig": {
+          "automaticParameters": false,
+          "rank": 50
+        }}}
       ```
-    > Warning: The reconstruction may fail for very small matrices as the `rank parameter can't be larger than the matrix dimensions`. I encountered this problem when trying to reconstruct sensitivity maps acquired with the body coil. To overcome the issue, you need to adjust the `rank` parameter in the config file `loraksConfig_adjRank.json`.
 
 + **Step 6:**
     + Access the `recon.sh` script and adjust the required resources and log file output path in the SBATCH parameters. The more resources you request for the job, the later your job will be scheduled. Try to keep the resource request as high as necessary, but as low as possible.
-    + Also adjust the paths pointing to the `loraksConfig.json` and to the local clone of the **image-reconstruction** repository in the reconstruction command. 
-    + The MATLAB version is specified as 9.16 but other versions may also work (not tested).
-    + ```
-      #SBATCH -c 16					# 16 cores for fast reco
-      #SBATCH --mem 500G			# 0.5 mm fully sampled is around 220G, need maybe double
-      #SBATCH --time 1800			# 10 echoes at 2 hours per echo but some nodes take 3 hours per echo
-      #SBATCH -o /data/u_kuegler_software/git/batch_LORAKSreco/logs/ironsleep_TH/%j.out	# redirect the output to log files
+    + Also adjust the path pointing to the local clone of the **image-reconstruction** repository in the reconstruction command. 
+    + The MATLAB version is specified as 24.2 but other versions may also work (not tested).
+    + ```bash
+        #SBATCH -c 16					# 16 cores for fast reco
+        #SBATCH --mem 500G				# 0.5 mm fully sampled is around 220G, need maybe double
+        #SBATCH --time 1440				# 10 echoes at 2 hours per echo but some nodes take 3 hours per echo
+        #SBATCH -o /data/u_kuegler_software/git/batch_LORAKSreco/logs/ironsleep_TH/%j.out	# redirect the output
+        #
+        # Real values for (16 cores, 500G request) are 213G RAM 8.5hrs time 27G file (PDw/T1w), 121G 6.5hrs 10G (MTw)
 
-      rawdata=$1
-      outdir=$2
+        rawdata=$1
+        outdir=$2
+        config=$3
 
-      echo "rawdata: $rawdata"
-      echo "outdir: $outdir"
+        echo "rawdata: $rawdata"
+        echo "outdir: $outdir"
+        # prints the contents of the temp JSON file for logging
+        echo "config:\\n"
+        echo "$(cat "$config")" 
 
-      MATLAB -v 9.16 matlab -batch "reconstruction('$rawdata','$outdir','/path/to/loraksConfig.json');exit" -sd /path/to/image-reconstruction
+        # recon_call.py, recon.sh, and loraksConfig json need to be in the same directory!
+
+        if ! [ -f "${config}" ]; then
+            echo "Error: Failed to find config: ${config}"
+            exit 1
+        fi
+
+        start=$(date +%s)
+
+        MATLAB -v 24.2 matlab -batch "reconstruction('$rawdata','$outdir','$config');exit" -sd /data/u_kuegler_software/git/image-reconstruction
       ```
 
 + **Step 7:** 
