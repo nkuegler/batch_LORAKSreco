@@ -27,7 +27,9 @@ The logs are saved in separate directories in the `logs/` folder (excluded from 
     + Make sure to use the the branch `WIP_romeoPhaseUnwrapping`, where you can use ROMEO for phase unwrapping during MCPC-3D-S coil combination instead of robustUnwrap. 
 + **CompileMRI (mritools including ROMEO)**
     + Information on how to install ROMEO and how to include it in the config file for the reconstruction can be found in the `WIP_romeoPhaseUnwrapping` branch's README under the heading *Using ROMEO for phase unwrapping during MCPC-3D-S coil combination*.
-    + As stated in the **image_reconstruction** README, download the latest release of [ROMEO from Github](https://github.com/korbinian90/CompileMRI.jl/releases) (on MPI CBS computers, download the version compiled for Ubuntu 20.04).
+    + As stated in the **image_reconstruction** README, download the latest release of [ROMEO from Github](https://github.com/korbinian90/CompileMRI.jl/releases) 
+    > [Note] 
+    > On MPI CBS computers (g9), you need to use an up-to-date version. I am currently using version 4.9.0. I suspect that versions compiled for outdated ubuntu versions (e.g., `ubuntu 20.04`) cause problems on g9 (not explicitely tested which versions work).
     + Examples of the `loraksConfig.json` can be found in the **batch_LORAKSreco** repository.
 + **batch_LORAKSreco** 
     + This repository contains scripts to submit the reconstructions of all specified sessions as separate batch jobs to a compute server using SLURM. [Reach out](mailto:kuegler@cbs.mpg.de?subject=Problems%20with%20loraks_reconstruction) if you encounter problems or need help with the code (kuegler@cbs.mpg.de).
